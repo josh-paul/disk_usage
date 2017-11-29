@@ -80,10 +80,17 @@ func main() {
 		return nil
 	})
 	total, free, inodes, inodesFree, _ := PartitionSpace(start)
-	// fmt.Println(dirs)
-	sortedDirs := sortDirsBySize(dirs)[:10]
+
+	sortedDirs := sortDirsBySize(dirs)
+	if len(dirs) > 10 {
+		sortedDirs = sortedDirs[:10]
+	}
 	// Sort the files array in descending order
+	totalFiles := len(files)
 	sort.Slice(files, func(i, j int) bool { return files[i].Size > files[j].Size })
+	if len(files) > 20 {
+		files = files[:20]
+	}
 
 	// Output to stdout
 	fmt.Printf("%.2f%% available disk space on %v\n", Percent(free, total), start)
@@ -99,10 +106,10 @@ func main() {
 		fmt.Printf("%-6v %v\n", humanize.Bytes(dir.Size), dir.Name)
 	}
 
-	fmt.Printf("\nTotal file count of %d\n", len(files))
-	fmt.Println("The 20 largest files are:")
+	fmt.Printf("\nTotal file count of %d\n", totalFiles)
+	fmt.Printf("The %v largest files are:", len(files))
 	fmt.Println("Size   Modified                      File")
-	for _, file := range files[:20] {
+	for _, file := range files {
 		fmt.Printf("%-6v %v %v\n", humanize.Bytes(file.Size), file.ModTime, file.Path)
 	}
 }
