@@ -61,7 +61,12 @@ func Percent(current uint64, all uint64) float64 {
 }
 
 func main() {
+	if len(os.Args) != 2 {
+		fmt.Println("You must provide a single location to start from.")
+		os.Exit(1)
+	}
 	start := os.Args[1]
+
 	files := make([]File, 0, 1024)
 	dirs := make(map[string]uint64)
 	filepath.Walk(start, func(file_path string, info os.FileInfo, err error) error {
