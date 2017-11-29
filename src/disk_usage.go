@@ -79,7 +79,10 @@ func main() {
 		}
 		return nil
 	})
-	total, free, inodes, inodesFree, _ := PartitionSpace(start)
+	total, free, inodes, inodesFree, error := PartitionSpace(start)
+	if error != nil {
+		fmt.Println(error)
+	}
 
 	sortedDirs := sortDirsBySize(dirs)
 	if len(dirs) > 10 {
