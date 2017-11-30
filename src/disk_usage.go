@@ -67,6 +67,17 @@ func main() {
 		os.Exit(1)
 	}
 	start := os.Args[1]
+	// Check if the `start` dir actually exists:
+	fileInfo, err := os.Stat(start)
+	if os.IsNotExist(err) {
+		fmt.Printf("%s: No such file or directory\n", start)
+		os.Exit(1)
+	}
+	// Check if it's a directory:
+	if !fileInfo.IsDir() {
+		fmt.Println("Start location must be a directory (not a file)")
+		os.Exit(1)
+	}
 	totalFiles := 0
 	files := make([]File, 0, 1024)
 	dirs := make(map[string]uint64)
