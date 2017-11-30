@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/cloudfoundry/gosigar"
 	"github.com/dustin/go-humanize"
 )
 
@@ -38,6 +39,18 @@ func sortDirsBySize(m map[string]uint64) SortedDirs {
 
 	sort.Slice(d, func(i, j int) bool { return d[i].Size > d[j].Size })
 	return d
+}
+
+// Get a list of mounts in the system
+func getMounts() (mounts map[string]bool) {
+	fslist := sigar.FileSystemList{}
+	fslist.Get()
+
+	mounts = make(map[string]bool)
+	for _, fs := range fslist.List {
+		mounts[fs.DirName] = true
+	}
+	return
 }
 
 // PartitionSpace returns total and free bytes available in a directory, e.g. `/`.
@@ -78,12 +91,17 @@ func main() {
 		fmt.Println("Start location must be a directory (not a file)")
 		os.Exit(1)
 	}
+	mounts := getMounts()
 	totalFiles := 0
-	files := make([]File, 0, 1024)
+	files := make([]File, 0, 20)
 	dirs := make(map[string]uint64)
 	filepath.Walk(start, func(file_path string, info os.FileInfo, err error) error {
 		if info.IsDir() {
-			dirs[file_path] = 0
+			if !mounts[file_path] {
+				dirs[file_path] = 0
+			} else {
+				return filepath.SkipDir
+			}
 		} else {
 			dirs[path.Dir(file_path)] += uint64(info.Size())
 			// Verify is not a Symlink
