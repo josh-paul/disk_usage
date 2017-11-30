@@ -97,7 +97,7 @@ func main() {
 	dirs := make(map[string]uint64)
 	filepath.Walk(start, func(file_path string, info os.FileInfo, err error) error {
 		if info.IsDir() {
-			if !mounts[file_path] {
+			if !mounts[file_path] || file_path == start {
 				dirs[file_path] = 0
 			} else {
 				return filepath.SkipDir

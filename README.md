@@ -11,14 +11,14 @@ This is the version of disk_usage written in go.
 
 
   * Using Go:
-    * Make sure you have [go](http://golang.org/) installed (for Mac users I strongly recommend HomeBrew: just `brew install go` or `port install go` if you use macports)
-    * run `go get github.com/josh-paul/go_disk_usage`
-    * Then run `$GOPATH/bin/disk_usage TARGET`
-  * Build from source:
+    * Make sure you have [go](http://golang.org/) installed (for Mac users I strongly recommend HomeBrew: just `brew install go`.
+    * Set your $GOPATH and $GOBIN variables.
 
-    ```shell
-    git clone git@github.com:josh-paul/go_disk_usage.git
-    cd go_disk_usage
-    go install
-    $GOPATH/bin/disk_usage TARGET
-    ```
+    * Build from source:
+
+      ```shell
+      git clone git@github.com:josh-paul/go_disk_usage.git
+      cd go_disk_usage
+      go build -o $GOBIN/disk_usage
+      $GOBIN/disk_usage TARGET
+      ```
