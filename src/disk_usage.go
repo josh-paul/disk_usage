@@ -41,16 +41,17 @@ func sortDirsBySize(m map[string]uint64) SortedDirs {
 }
 
 // PartitionSpace returns total and free bytes available in a directory, e.g. `/`.
-func PartitionSpace(path string) (total uint64, free uint64, inodes uint64, inodesFree uint64, err error) {
+func PartitionSpace(path string) (m map[string]uint64, err error) {
 	s := syscall.Statfs_t{}
 	err = syscall.Statfs(path, &s)
 	if err != nil {
 		return
 	}
-	total = uint64(int(s.Bsize) * int(s.Blocks))
-	free = uint64(int(s.Bsize) * int(s.Bfree))
-	inodes = uint64(s.Files)
-	inodesFree = uint64(s.Ffree)
+	m = make(map[string]uint64)
+	m["total"] = uint64(int(s.Bsize) * int(s.Blocks))
+	m["free"] = uint64(int(s.Bsize) * int(s.Bfree))
+	m["inodes"] = uint64(s.Files)
+	m["inodesFree"] = uint64(s.Ffree)
 	return
 }
 
@@ -96,9 +97,9 @@ func main() {
 		}
 		return nil
 	})
-	total, free, inodes, inodesFree, error := PartitionSpace(start)
-	if error != nil {
-		fmt.Println(error)
+	p, err := PartitionSpace(start)
+	if err != nil {
+		fmt.Println(err)
 	}
 
 	sortedDirs := sortDirsBySize(dirs)
@@ -107,11 +108,11 @@ func main() {
 	}
 
 	// Output to stdout
-	fmt.Printf("%.2f%% available disk space on %v\n", Percent(free, total), start)
-	fmt.Printf("Total: %v, Used: %v, Free: %v\n", humanize.Bytes(total), humanize.Bytes((total - free)), humanize.Bytes(free))
+	fmt.Printf("%.2f%% available disk space on %v\n", Percent(p["free"], p["total"]), start)
+	fmt.Printf("Total: %v, Used: %v, Free: %v\n", humanize.Bytes(p["total"]), humanize.Bytes((p["total"] - p["free"])), humanize.Bytes(p["free"]))
 
-	fmt.Printf("\n%.2f%% of total inodes are free.\n", Percent(inodesFree, inodes))
-	fmt.Printf("Total: %v, Used: %v, Free: %v\n", inodes, (inodes - inodesFree), inodesFree)
+	fmt.Printf("\n%.2f%% of total inodes are free.\n", Percent(p["inodesFree"], p["inodes"]))
+	fmt.Printf("Total: %v, Used: %v, Free: %v\n", p["inodes"], (p["inodes"] - p["inodesFree"]), p["inodesFree"])
 
 	fmt.Printf("\nTotal directory count of %d\n", len(dirs))
 	fmt.Printf("The %v largest directories are:\n", len(sortedDirs))
