@@ -21,7 +21,7 @@ type Dir struct {
 
 // File struct containing the specific file info we are looking for
 type File struct {
-	ModTime time.Time
+	ModTime string
 	Name    string
 	Path    string
 	Size    uint64
@@ -108,7 +108,7 @@ func main() {
 			if info.Mode()&os.ModeSymlink == 0 {
 				totalFiles++
 				file := File{
-					ModTime: info.ModTime(),
+					ModTime: info.ModTime().Format(time.RFC3339),
 					Name:    info.Name(),
 					Path:    file_path,
 					Size:    uint64(info.Size()),
@@ -152,7 +152,7 @@ func main() {
 
 	fmt.Printf("\nTotal file count of %d\n", totalFiles)
 	fmt.Printf("The %v largest files are:\n", len(files))
-	fmt.Println("Size   Modified                      File")
+	fmt.Println("Size   Modified                  File")
 	for _, file := range files {
 		fmt.Printf("%-6v %v %v\n", humanize.Bytes(file.Size), file.ModTime, file.Path)
 	}
