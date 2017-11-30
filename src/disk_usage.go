@@ -66,7 +66,7 @@ func main() {
 		os.Exit(1)
 	}
 	start := os.Args[1]
-
+	totalFiles := 0
 	files := make([]File, 0, 1024)
 	dirs := make(map[string]uint64)
 	filepath.Walk(start, func(file_path string, info os.FileInfo, err error) error {
@@ -74,13 +74,25 @@ func main() {
 			dirs[file_path] = 0
 		} else {
 			dirs[path.Dir(file_path)] += uint64(info.Size())
-			file := File{
-				ModTime: info.ModTime(),
-				Name:    info.Name(),
-				Path:    file_path,
-				Size:    uint64(info.Size()),
+			// Verify is not a Symlink
+			if info.Mode()&os.ModeSymlink == 0 {
+				totalFiles++
+				file := File{
+					ModTime: info.ModTime(),
+					Name:    info.Name(),
+					Path:    file_path,
+					Size:    uint64(info.Size()),
+				}
+				// Keep files array to length of 20, re-sort of file add to full array
+				if len(files) < 20 {
+					files = append(files, file)
+				} else {
+					if file.Size > files[len(files)-1].Size {
+						files[len(files)-1] = file
+						sort.Slice(files, func(i, j int) bool { return files[i].Size > files[j].Size })
+					}
+				}
 			}
-			files = append(files, file)
 		}
 		return nil
 	})
@@ -93,12 +105,6 @@ func main() {
 	if len(dirs) > 10 {
 		sortedDirs = sortedDirs[:10]
 	}
-	// Sort the files array in descending order
-	totalFiles := len(files)
-	sort.Slice(files, func(i, j int) bool { return files[i].Size > files[j].Size })
-	if len(files) > 20 {
-		files = files[:20]
-	}
 
 	// Output to stdout
 	fmt.Printf("%.2f%% available disk space on %v\n", Percent(free, total), start)
@@ -108,14 +114,14 @@ func main() {
 	fmt.Printf("Total: %v, Used: %v, Free: %v\n", inodes, (inodes - inodesFree), inodesFree)
 
 	fmt.Printf("\nTotal directory count of %d\n", len(dirs))
-	fmt.Println("The 10 largest directories are:")
+	fmt.Printf("The %v largest directories are:\n", len(sortedDirs))
 	fmt.Println("Size   Directory")
 	for _, dir := range sortedDirs {
 		fmt.Printf("%-6v %v\n", humanize.Bytes(dir.Size), dir.Name)
 	}
 
 	fmt.Printf("\nTotal file count of %d\n", totalFiles)
-	fmt.Printf("The %v largest files are:", len(files))
+	fmt.Printf("The %v largest files are:\n", len(files))
 	fmt.Println("Size   Modified                      File")
 	for _, file := range files {
 		fmt.Printf("%-6v %v %v\n", humanize.Bytes(file.Size), file.ModTime, file.Path)
