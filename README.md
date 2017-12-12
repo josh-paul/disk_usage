@@ -1,8 +1,8 @@
 disk_usage
 ==========
 
-disk_usage is a utility that will walk down from a starting location on a filesystem and return 
-pertinent usage data. This includes, space of the partition, inode data, upto the 10 largest 
+disk_usage is a utility that will walk down from a starting location on a filesystem and return
+pertinent usage data. This includes, space of the partition, inode data, upto the 10 largest
 cumulative directories, and upto the 20 largest files.
 
 This is the version of disk_usage written in go.
@@ -17,13 +17,13 @@ This is the version of disk_usage written in go.
     * Build from source:
 
       ```shell
-      git clone git@github.com:josh-paul/go_disk_usage.git
-      cd go_disk_usage
+      git clone git@github.com:josh-paul/disk_usage.git
+      cd disk_usage
       go build -o $GOBIN/disk_usage
       $GOBIN/disk_usage TARGET
       ```
   * Download binary
-    * Download correct binary from github releases (https://github.com/josh-paul/go_disk_usage/releases/)
+    * Download correct binary from github releases (https://github.com/josh-paul/disk_usage/releases/)
     * Save file as disk_usage in a location in your system path and add executable permisions.
 
 ### Sample Output
