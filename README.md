@@ -1,6 +1,9 @@
 disk_usage
 ==========
 
+
+[![Go Report Card](https://goreportcard.com/badge/github.com/josh-paul/disk_usage)](https://goreportcard.com/report/github.com/josh-paul/disk_usage)
+
 disk_usage is a utility that will walk down from a starting location on a filesystem and return
 pertinent usage data. This includes, space of the partition, inode data, upto the 10 largest
 cumulative directories, and upto the 20 largest files.
